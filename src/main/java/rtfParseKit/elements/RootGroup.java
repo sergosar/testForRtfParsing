@@ -14,4 +14,9 @@ public class RootGroup extends MyGroup{
         }
         return rootGroup;
     }
+
+    @Override
+    public String getText() {
+        return "This is Root Group";
+    }
 }

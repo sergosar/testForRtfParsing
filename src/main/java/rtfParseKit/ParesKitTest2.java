@@ -1,25 +1,35 @@
 package rtfParseKit;
 
-import com.rtfparserkit.converter.text.StringTextConverter;
-import com.rtfparserkit.parser.*;
+import com.rtfparserkit.parser.RtfStreamSource;
 import com.rtfparserkit.parser.standard.StandardRtfParser;
+import rtfParseKit.MyListener;
+import rtfParseKit.MyListener2;
 import rtfParseKit.MyRtfParseKit.TreeChanger;
 import rtfParseKit.elements.MyGroup;
 import rtfParseKit.elements.RootGroup;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class ParesKitTest {
+public class ParesKitTest2 {
     static String readFile(String path, Charset encoding)
             throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
     }
 
+    final static List<String> variables = new ArrayList<>(Arrays.asList
+            ("\\\\s_002.ssYppName\\\\", "\\\\s_002.ssnumber\\\\", "\\\\s_002.ssSAPnumber\\\\",  "\\\\s_001. sCustomerPersonHL\\\\","\\\\s_001. nsPermitNumber\\\\", "\\\\s_001.ddPermitDate\\\\",
+                    "\\\\s_001. ssRepNumAggrAgency\\\\", "\\\\s_001. ddDateAggrAgency\\\\", "\\\\s_001.sDocMC\\\\"));
+
+    final static List<String> testVariables = new ArrayList<>(Arrays.asList
+            ("test1", "test2", "test3",  "test4","test5", "test6",
+                    "test7", "test8", "test9"));
     public static void main(String[] args) {
         final File INPUT_FILE = new File("src/main/resources/Запрос на поставку.rtf");
         final File OUTPUT_FILE = new File("src/main/resources/test1.rtf");
@@ -29,13 +39,7 @@ public class ParesKitTest {
         OutputStream out;
         try {
 
-//            RtfStringSource stringSource = new RtfStringSource(readFile("src/main/resources/Запрос на поставку.rtf", Charset.forName("windows-1251")));
-//            Field f = stringSource.getClass().getDeclaredField("data"); //NoSuchFieldException
-//            f.setAccessible(true);
-//            String data = (String) f.get(stringSource);
-            //        System.out.println("data = " + data);
 
-            //System.out.println("stringSource = " + stringSource);
             is = new FileInputStream(INPUT_FILE.getPath());
             out = new FileOutputStream(OUTPUT_FILE.getPath());
 
@@ -44,7 +48,7 @@ public class ParesKitTest {
             RtfStreamSource rtfStreamSource = new RtfStreamSource(is);
 
             MyListener2 myListener2 = new MyListener2(out);
-            MyListener myListener = new MyListener(out);
+
 
             parser.parse(rtfStreamSource, myListener2);
 
@@ -53,21 +57,17 @@ public class ParesKitTest {
             RootGroup rootGroup = myListener2.getRootGroup();
 
             TreeChanger treeChanger = new TreeChanger(rootGroup);
-            MyGroup temp = TreeChanger.getGroupWithText(rootGroup, "s_002.ssSAPnumber");
+//            MyGroup temp = TreeChanger.getGroupWithText(rootGroup, "s_002.ssSAPnumber");
 
-            TreeChanger.changeOneStringValue(temp,"\\\\s_002.ssSAPnumber\\\\", "SUPERTEST");
-            System.out.println(temp.getText());
+            TreeChanger.changeStringValues(rootGroup,variables,testVariables);
+//            System.out.println(temp.getText());
             myListener2.writeDocument();
 
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        IRtfSource source = new RtfStreamSource(is);
-//        IRtfParser parser = new StandardRtfParser();
 
-//        char q = 'q';
-//        System.out.println((int)('\''));
 
 
     }

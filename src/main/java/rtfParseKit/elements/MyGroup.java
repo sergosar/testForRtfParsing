@@ -18,11 +18,11 @@ public class MyGroup implements Writeable {
 
     List<Writeable> innerGroups = new ArrayList<>(); // нужно ли сразу инициализировать?
 
-    //  List<MyCommand> commands = new ArrayList<>();
-
     String innerString = null;
 
     MyGroup parentGroup = null;
+
+    private int groupIndex;
 
     public void addCommand(MyCommand myCommand) {
         innerGroups.add(myCommand);
@@ -36,9 +36,14 @@ public class MyGroup implements Writeable {
         innerGroups.add(commandParams);
     }
 
-    public boolean isLastCommand(){
+    public void addString(MyString myString) {
+        innerGroups.add(myString);
+    }
+
+    public boolean isLastCommand() {
         return innerGroups.get(innerGroups.size() - 1) instanceof MyCommand;
     }
+
     public MyCommand getLastCommand() {
         return (MyCommand) innerGroups.get(innerGroups.size() - 1);
     }
@@ -53,6 +58,21 @@ public class MyGroup implements Writeable {
 
     public void setParentGroup(MyGroup parentGroup) {
         this.parentGroup = parentGroup;
+    }
+
+    public int getGroupIndex() {
+        return groupIndex;
+    }
+
+    public void setGroupIndex(int groupIndex) {
+        this.groupIndex = groupIndex;
+    }
+
+    public MyGroup() {
+    }
+
+    public MyGroup(int groupIndex) {
+        this.groupIndex = groupIndex;
     }
 
     @Override
@@ -85,6 +105,10 @@ public class MyGroup implements Writeable {
 
     }
 
+
+    public List<Writeable> getInnerGroups() {
+        return innerGroups;
+    }
 
     @Override
     public String getText() {

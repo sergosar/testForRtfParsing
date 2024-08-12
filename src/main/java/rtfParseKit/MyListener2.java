@@ -3,10 +3,7 @@ package rtfParseKit;
 import com.rtfparserkit.parser.IRtfListener;
 import com.rtfparserkit.rtf.Command;
 import org.apache.commons.codec.binary.Hex;
-import rtfParseKit.elements.CommandParams;
-import rtfParseKit.elements.MyCommand;
-import rtfParseKit.elements.MyGroup;
-import rtfParseKit.elements.RootGroup;
+import rtfParseKit.elements.*;
 
 
 import java.io.IOException;
@@ -20,17 +17,20 @@ import java.util.List;
 
 public class MyListener2 implements IRtfListener {
 
-    byte[] temp;
-
     int commandCount = 0;
     int stringCount = 0;
 
+    int gruopDepth2Count = 0;
+
     int groupDepth=1;
     OutputStream os;
-
+    int groupIndex = 1;
     RootGroup rootGroup;
     MyGroup currentGroup;
 
+    public RootGroup getRootGroup() {
+        return rootGroup;
+    }
 
     final static Charset windowsCharset = Charset.forName("windows-1251");
     final static Charset utf16Charset = StandardCharsets.UTF_16;
@@ -40,7 +40,7 @@ public class MyListener2 implements IRtfListener {
 
     Command previousCommand = null;
 
-    final List<String> varibbles = new ArrayList<>(Arrays.asList
+    final List<String> variables = new ArrayList<>(Arrays.asList
             ("s_002.ssYppName","s_002.ssSAPnumber","s_002.ssSAPnumber","s_002.ssnumber","s_001. sCustomerPersonHL","s_001. sCustomerPersonHL",
                     "s_001. ssRepNumAggrAgency","s_001. ddDateAggrAgency","s_001.sDocMC"));
 
@@ -52,27 +52,32 @@ public class MyListener2 implements IRtfListener {
     public void processDocumentStart() {
         rootGroup = RootGroup.getInstance();
         currentGroup= rootGroup;
-
     }
 
     @Override
     public void processDocumentEnd() {
+
+
         System.out.println("processDocumentEnd");
-        try {
-            os.write(rootGroup.bytesForWriting());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            os.write(rootGroup.bytesForWriting());
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     @Override
     public void processGroupStart() {
         var depth = "  ".repeat(groupDepth);
         System.out.println(groupDepth +depth + "{");
+        if(groupDepth == 2) {
+            gruopDepth2Count++;
+            System.out.println("gruopDepth2Count = " + gruopDepth2Count);
+        }
         if(!rootGroup.start) {
             rootGroup.start=true;
         } else {
-            MyGroup newGroup = new MyGroup();
+            MyGroup newGroup = new MyGroup(groupIndex++);
             newGroup.setParentGroup(currentGroup);
             currentGroup.addGroup(newGroup);
             currentGroup = newGroup;
@@ -110,14 +115,21 @@ public class MyListener2 implements IRtfListener {
         } else if(currentGroup.isLastCommand() && (currentGroup.getLastCommand().getCommand().equals(Command.leveltemplateid)
         || currentGroup.getLastCommand().getCommand().equals(Command.levelnumbers))){
             currentGroup.addCommandParams(new CommandParams(s));
-        } else
-            currentGroup.setStringForWrite(s);
+        } else {
+            if (s.contains("\\")) {
+                s = s.replace("\\", "\\\\");
+//                System.out.println("s = " + s);
+            }
+            currentGroup.addString(new MyString(s));
+        }
+      //      currentGroup.setStringForWrite(s);
 
         stringCount++;
     }
 
     @Override
     public void processCommand(Command command, int i, boolean b, boolean b1) {
+   //     System.out.println("command N " + commandCount + ": " + command + ",  int i = " + i + ",  boolean b = " + b + ", boolean b1 = " + b1);
         previousCommand = command;
         currentGroup.addCommand(new MyCommand(command,i,b,b1));
 
@@ -168,8 +180,12 @@ public class MyListener2 implements IRtfListener {
         return result.toString();
     }
 
-
-
-
+    public void writeDocument() {
+                try {
+            os.write(rootGroup.bytesForWriting());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
 

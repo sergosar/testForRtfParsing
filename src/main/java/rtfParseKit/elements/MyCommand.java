@@ -50,10 +50,10 @@ public class MyCommand implements Writeable{
             stringBuilder.append(i);
         }
         if(hasSemicolon){
-            stringBuilder.append(";");
+            stringBuilder.append(" ;");
         }
 
-        stringBuilder.append(" ");
+        if(!hasSemicolon)stringBuilder.append(" ");
         return stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
 
     }
