@@ -24,12 +24,13 @@ public class ParesKitTest2 {
     }
 
     final static List<String> variables = new ArrayList<>(Arrays.asList
-            ("\\\\s_002.ssYppName\\\\", "\\\\s_002.ssnumber\\\\", "\\\\s_002.ssSAPnumber\\\\",  "\\\\s_001. sCustomerPersonHL\\\\","\\\\s_001. nsPermitNumber\\\\", "\\\\s_001.ddPermitDate\\\\",
+            ("\\\\s_002.ssYppName\\\\", "\\\\s_002.ssnumber\\\\", "\\\\s_002.ssSAPnumber\\\\", "\\\\s_001. sCustomerPersonHL\\\\", "\\\\s_001. nsPermitNumber\\\\", "\\\\s_001.ddPermitDate\\\\",
                     "\\\\s_001. ssRepNumAggrAgency\\\\", "\\\\s_001. ddDateAggrAgency\\\\", "\\\\s_001.sDocMC\\\\"));
 
     final static List<String> testVariables = new ArrayList<>(Arrays.asList
-            ("test1", "test2", "test3",  "test4","test5", "test6",
+            ("test1", "test2", "test3", "test4", "test5", "test6",
                     "test7", "test8", "test9"));
+
     public static void main(String[] args) {
         final File INPUT_FILE = new File("src/main/resources/Запрос на поставку.rtf");
         final File OUTPUT_FILE = new File("src/main/resources/test1.rtf");
@@ -53,13 +54,12 @@ public class ParesKitTest2 {
             parser.parse(rtfStreamSource, myListener2);
 
 
-
             RootGroup rootGroup = myListener2.getRootGroup();
 
             TreeChanger treeChanger = new TreeChanger(rootGroup);
 //            MyGroup temp = TreeChanger.getGroupWithText(rootGroup, "s_002.ssSAPnumber");
 
-            TreeChanger.changeStringValues(rootGroup,variables,testVariables);
+            TreeChanger.changeStringValues(rootGroup, variables, testVariables);
 //            System.out.println(temp.getText());
             myListener2.writeDocument();
 
@@ -67,7 +67,6 @@ public class ParesKitTest2 {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
 
     }

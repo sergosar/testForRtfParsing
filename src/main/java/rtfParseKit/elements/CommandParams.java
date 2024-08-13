@@ -1,6 +1,6 @@
 package rtfParseKit.elements;
 
-public class CommandParams implements Writeable{
+public class CommandParams implements Writeable {
     String text;
 
     public void setText(String text) {
