@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TreeChanger {
-    RootGroup rootGroup;
+    static RootGroup rootGroup;
     final static List<String> variables = new ArrayList<>(Arrays.asList
             ("s_002.ssYppName", "s_002.ssSAPnumber", "s_002.ssnumber", "s_001. sCustomerPersonHL", "s_001. sCustomerPersonHL",
                     "s_001. ssRepNumAggrAgency", "s_001. ddDateAggrAgency", "s_001.sDocMC"));
@@ -37,7 +37,7 @@ public class TreeChanger {
 
     public static MyGroup getGroupWithStartSymbol(MyGroup myGroup) {
         MyGroup result = null;
-        if (myGroup ==null) {
+        if (myGroup == null) {
             return result;
         }
         for (Writeable w : myGroup.getInnerGroups()) {
@@ -57,6 +57,7 @@ public class TreeChanger {
     /**
      * Заменяет список из специальных служебных слов на новые значения.
      * Порядок специальных слов и соответствующих им служебных значений в списках должен совпадать.
+     *
      * @param rootGroup
      * @param oldVariables
      * @param newVariables
@@ -68,9 +69,10 @@ public class TreeChanger {
         var positionGroup = rootGroup;
         for (String oldString : oldVariables) {
             while (true) {
-                if(changeOneStringValue(positionGroup, oldString, newVariables.get(0))) {
+                if (changeOneStringValue(positionGroup, oldString, newVariables.get(0))) {
+                    System.out.println("changeOneStringValue " + "oldString : " + oldString + "newVariable:  " + newVariables.get(0));
                     newVariables.remove(0);
-                    System.out.println("changeOneStringValue " + "oldString : " + oldString + "newVariable:  "+ newVariables.get(0) );
+
                     break;
                 }
                 positionGroup = getNextGroup(positionGroup);
@@ -105,7 +107,7 @@ public class TreeChanger {
     /*без оптимизации обхода не с начала*/
     public static boolean changeOneStringValue(MyGroup group, String oldValue, String newValue) {
         MyGroup startGroup = getGroupWithStartSymbol(group);
-        if (startGroup==null) {
+        if (startGroup == null) {
             return false;
         }
         if (!getFullWord(startGroup).equals(oldValue)) {
@@ -160,7 +162,9 @@ public class TreeChanger {
             if (w instanceof MyCommand) continue;
             if (w instanceof MyString) continue;
             if (w instanceof MyGroup) {
-                if (((MyGroup) w).getGroupIndex() == previousGroupNum + 1) return (MyGroup) w;
+                if (((MyGroup) w).getGroupIndex() == previousGroupNum + 1) {
+                    return (MyGroup) w;
+                }
                 MyGroup res = getNextGroupByNum((MyGroup) w, previousGroupNum);
                 if (res != null) return res;
             }
@@ -173,8 +177,8 @@ public class TreeChanger {
      * @return следующюю за startGroup
      */
     private static MyGroup getNextGroup(MyGroup startGroup) {
-        if(startGroup == null) return null;
-        return getNextGroupByNum(startGroup, startGroup.getGroupIndex());
+        if (startGroup == null) return null;
+        return getNextGroupByNum(rootGroup, startGroup.getGroupIndex());
     }
 
     public static List<Writeable> getCopyPart(MyGroup parentGroup, String startPos, String endPos) {
@@ -193,9 +197,13 @@ public class TreeChanger {
         stringBuilder.append(startGroupText);
         var nextGroup = getNextGroup(groupWithStartSymbol);
         while (true) {
+            if (nextGroup == null) {
+                break;
+            }
             if (getGroupText(nextGroup) != null) {
                 stringBuilder.append(getGroupText(nextGroup));
-            }
+            } else break;
+
             if (getGroupText(nextGroup).endsWith("\\")) {
                 break;
             }
