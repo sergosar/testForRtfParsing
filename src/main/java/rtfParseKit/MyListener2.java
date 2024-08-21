@@ -20,7 +20,7 @@ public class MyListener2 implements IRtfListener {
     int commandCount = 0;
     int stringCount = 0;
 
-    int gruopDepth2Count = 0;
+    int groupDepth2Count = 0;
 
     int groupDepth=1;
     OutputStream os;
@@ -71,8 +71,8 @@ public class MyListener2 implements IRtfListener {
         var depth = "  ".repeat(groupDepth);
         System.out.println(groupDepth +depth + "{");
         if(groupDepth == 2) {
-            gruopDepth2Count++;
-            System.out.println("gruopDepth2Count = " + gruopDepth2Count);
+            groupDepth2Count++;
+            System.out.println("gruopDepth2Count = " + groupDepth2Count + "groupIndex = " + groupIndex);
         }
         if(!rootGroup.start) {
             rootGroup.start=true;

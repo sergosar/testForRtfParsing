@@ -78,25 +78,30 @@ public class MyGroup implements Writeable {
     @Override
     public byte[] bytesForWriting() {
 
+
+        System.out.println("groupIndex:  " + groupIndex);
         try {
+            if(baos.size()>0) {
+                baos.reset();
+            }
             baos.write("{".getBytes(utfCharset));
             for (Writeable writeable : innerGroups) {
                 baos.write(writeable.bytesForWriting());
             }
-            if (innerString != null) {
-                if (innerString.contains("\\")) {
-                    innerString = innerString.replace("\\", "\\\\");
-                }
-
-                Writeable lastW = innerGroups.get(innerGroups.size() - 1);
-                if ((lastW instanceof MyCommand) && (
-                        ((MyCommand) lastW).command.equals(Command.leveltemplateid) || lastW.equals(Command.levelnumbers))) {
-                    baos.write(HexUtil.getHex2(innerString).getBytes(utfCharset));
-                } else {
-                    baos.write(HexUtil.getHex(innerString).getBytes(utfCharset));
-                }
-
-            }
+//            if (innerString != null) {
+//                if (innerString.contains("\\")) {
+//                    innerString = innerString.replace("\\", "\\\\");
+//                }
+//                System.out.println("innerString != null");
+//                Writeable lastW = innerGroups.get(innerGroups.size() - 1);
+//                if ((lastW instanceof MyCommand) && (
+//                        ((MyCommand) lastW).command.equals(Command.leveltemplateid) || lastW.equals(Command.levelnumbers))) {
+//                    baos.write(HexUtil.getHex2(innerString).getBytes(utfCharset));
+//                } else {
+//                    baos.write(HexUtil.getHex(innerString).getBytes(utfCharset));
+//                }
+//
+//            }
             baos.write("}".getBytes(utfCharset));
         } catch (IOException e) {
             throw new RuntimeException(e);

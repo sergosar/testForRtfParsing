@@ -2,9 +2,7 @@ package rtfParseKit.MyRtfParseKit;
 
 import rtfParseKit.elements.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class TreeChanger {
     static RootGroup rootGroup;
@@ -162,7 +160,10 @@ public class TreeChanger {
             if (w instanceof MyCommand) continue;
             if (w instanceof MyString) continue;
             if (w instanceof MyGroup) {
-                if (((MyGroup) w).getGroupIndex() == previousGroupNum + 1) {
+//                if (((MyGroup) w).getGroupIndex() == previousGroupNum + 1) {
+//                    return (MyGroup) w;
+//                }
+                if (((MyGroup) w).getGroupIndex() > previousGroupNum) {
                     return (MyGroup) w;
                 }
                 MyGroup res = getNextGroupByNum((MyGroup) w, previousGroupNum);
@@ -186,7 +187,7 @@ public class TreeChanger {
     }
 
     /**
-     * Формирование полного служебного слова, т.к. слово может быть растянуто на нескоколько групп
+     * Формирование полного служебного слова, т.к. слово может быть растянуто на несколько групп
      */
     private static String getFullWord(MyGroup groupWithStartSymbol) {
         String startGroupText = getGroupText(groupWithStartSymbol);
@@ -212,4 +213,58 @@ public class TreeChanger {
         return stringBuilder.toString();
     }
 
+    public static void scanCopy() {
+        MyGroup groupWithScan = TreeChanger.getGroupWithText(rootGroup, "\\scan(s_002)\\");
+
+        MyGroup groupWithEndScan = TreeChanger.getGroupWithText(rootGroup, "\\EndScan\\");
+        MyGroup copyText = new MyGroup();
+        MyGroup parent = groupWithEndScan.getParentGroup();
+        MyGroup parent2 = groupWithScan.getParentGroup();
+        MyGroup groupAfterGroupWithScan = getNextGroupWithSameDepth(groupWithScan);
+        int indexStart = groupWithEndScan.getParentGroup().getInnerGroups().indexOf(groupAfterGroupWithScan);
+        System.out.println("indexStart : " + indexStart);
+
+        MyGroup groupBeforeGroupWithEndScan = getNextGroupWithSameDepth(groupWithScan);
+        int indexEnd = groupWithEndScan.getParentGroup().getInnerGroups().indexOf(groupWithEndScan);
+        System.out.println("indexEnd : " + indexEnd);
+        copyText.getInnerGroups().addAll(groupWithEndScan.getParentGroup().getInnerGroups().subList(indexStart,indexEnd));
+        groupWithScan.getParentGroup().getInnerGroups().addAll(indexEnd, copyText.getInnerGroups());
+        System.out.println();
+    }
+
+//    /**
+//     * Формирование
+//     */
+//    private static MyGroup copyPart(MyGroup from, MyGroup to) {
+//        return;
+//    }
+
+    ;
+
+    private static MyGroup getNextGroupWithSameDepth(MyGroup previous) {
+        MyGroup result = null;
+        MyGroup parent = previous.getParentGroup();
+        for (Writeable w : parent.getInnerGroups()) {
+            if (w instanceof MyGroup && ((MyGroup) w).getGroupIndex() > previous.getGroupIndex()) {
+                result = (MyGroup) w;
+                break;
+            }
+        }
+        return result;
+    }
+
+    private static MyGroup getPreviousGroupWithSameDepth(MyGroup next) {
+        MyGroup result = null;
+        MyGroup parent = next.getParentGroup();
+        ListIterator<Writeable> it = parent.getInnerGroups().listIterator(parent.getInnerGroups().size());
+        while (it.hasPrevious()) {
+            Writeable w = it.previous();
+            if (w instanceof MyGroup && ((MyGroup) w).getGroupIndex() < next.getGroupIndex()) {
+                result = (MyGroup) w;
+                break;
+            }
+        }
+        return result;
+    }
 }
+

@@ -24,7 +24,7 @@ public class ParesKitTest2 {
     }
 
     final static List<String> variables = new ArrayList<>(Arrays.asList
-            ("\\\\s_002.ssYppName\\\\", "\\\\s_002.ssnumber\\\\", "\\\\s_002.ssSAPnumber\\\\", "\\\\s_001. sCustomerPersonHL\\\\", "\\\\s_001. nsPermitNumber\\\\", "\\\\s_001.ddPermitDate\\\\",
+            ("\\\\s_002.ssYppName\\\\", "\\\\s_002.ssnumber\\\\", "\\\\s_002.ssSAPnumber\\\\", "\\\\ s_001. sCustomerPersonHL\\\\", "\\\\s_001. nsPermitNumber\\\\", "\\\\s_001.ddPermitDate\\\\",
                     "\\\\s_001. ssRepNumAggrAgency\\\\", "\\\\s_001. ddDateAggrAgency\\\\", "\\\\s_001.sDocMC\\\\"));
 
     final static List<String> testVariables = new ArrayList<>(Arrays.asList
@@ -57,9 +57,10 @@ public class ParesKitTest2 {
             RootGroup rootGroup = myListener2.getRootGroup();
 
             TreeChanger treeChanger = new TreeChanger(rootGroup);
-//            MyGroup temp = TreeChanger.getGroupWithText(rootGroup, "s_002.ssSAPnumber");
+
 
             TreeChanger.changeStringValues(rootGroup, variables, testVariables);
+            TreeChanger.scanCopy();
 //            System.out.println(temp.getText());
             myListener2.writeDocument();
 
