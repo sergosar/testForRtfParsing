@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 public class HexUtil {
     final Charset utfCharset = StandardCharsets.UTF_8;
     final static Charset windowsCharset = Charset.forName("windows-1251");
+
     public static String getHex(String s) {
 
         StringBuilder result = new StringBuilder();
@@ -24,6 +25,7 @@ public class HexUtil {
         }
         return result.toString();
     }
+
     public static String getHex2(String s) {
 
         StringBuilder result = new StringBuilder();

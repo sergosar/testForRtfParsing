@@ -4,12 +4,8 @@ import com.rtfparserkit.parser.IRtfListener;
 import com.rtfparserkit.rtf.Command;
 import org.apache.commons.codec.binary.Hex;
 
-
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -23,7 +19,7 @@ public class MyListener implements IRtfListener {
     int commandCount = 0;
     int stringCount = 0;
 
-    int groupDepth=1;
+    int groupDepth = 1;
     OutputStream os;
 
     final static Charset windowsCharset = Charset.forName("windows-1251");
@@ -35,8 +31,8 @@ public class MyListener implements IRtfListener {
     Command previousCommand = null;
 
     final List<String> varibbles = new ArrayList<>(Arrays.asList
-            ("s_002.ssYppName","s_002.ssSAPnumber","s_002.ssSAPnumber","s_002.ssnumber","s_001. sCustomerPersonHL","s_001. sCustomerPersonHL",
-                    "s_001. ssRepNumAggrAgency","s_001. ddDateAggrAgency","s_001.sDocMC"));
+            ("s_002.ssYppName", "s_002.ssSAPnumber", "s_002.ssSAPnumber", "s_002.ssnumber", "s_001. sCustomerPersonHL", "s_001. sCustomerPersonHL",
+                    "s_001. ssRepNumAggrAgency", "s_001. ddDateAggrAgency", "s_001.sDocMC"));
 
     public MyListener(OutputStream os) {
         this.os = os;
@@ -56,7 +52,7 @@ public class MyListener implements IRtfListener {
     @Override
     public void processGroupStart() {
         var depth = "  ".repeat(groupDepth);
-        System.out.println(groupDepth +depth + "{");
+        System.out.println(groupDepth + depth + "{");
 
         try {
             os.write("{".getBytes(utfCharset));
@@ -97,7 +93,7 @@ public class MyListener implements IRtfListener {
         System.out.println("processString N " + stringCount + ": " + s);
 
 
-  //      if
+        //      if
         if (s.contains("\\")) {
             s = s.replace("\\", "\\\\");
             System.out.println("s = " + s);

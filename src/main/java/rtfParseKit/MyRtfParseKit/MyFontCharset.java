@@ -5,19 +5,17 @@ public class MyFontCharset {
     /**
      * Convert a font character set to an encoding name.
      */
-    public static String getCharset(int parameter)
-    {
+    public static String getCharset(int parameter) {
         String result = null;
-        if (parameter >= 0 && parameter < MAPPING.length)
-        {
+        if (parameter >= 0 && parameter < MAPPING.length) {
             result = MAPPING[parameter];
         }
         return result;
     }
 
     private static final String[] MAPPING = new String[256];
-    static
-    {
+
+    static {
         MAPPING[0] = "1252"; // ANSI
         MAPPING[1] = null; // Default
         MAPPING[2] = "1252"; // Symbol - according to the specs this is codepage 42 "Symbol". What's the Java equivalent? 1252 seems to work...

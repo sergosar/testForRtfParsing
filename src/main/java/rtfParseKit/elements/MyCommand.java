@@ -2,11 +2,9 @@ package rtfParseKit.elements;
 
 import com.rtfparserkit.rtf.Command;
 
-import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
-public class MyCommand implements Writeable{
+public class MyCommand implements Writeable {
 
     Command command;
 
@@ -35,7 +33,6 @@ public class MyCommand implements Writeable{
     }
 
 
-
     @Override
     public byte[] bytesForWriting() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -49,11 +46,11 @@ public class MyCommand implements Writeable{
         if (b) {
             stringBuilder.append(i);
         }
-        if(hasSemicolon){
+        if (hasSemicolon) {
             stringBuilder.append(" ;");
         }
 
-        if(!hasSemicolon)stringBuilder.append(" ");
+        if (!hasSemicolon) stringBuilder.append(" ");
         return stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
 
     }

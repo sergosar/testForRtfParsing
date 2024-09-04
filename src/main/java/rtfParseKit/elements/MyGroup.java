@@ -1,10 +1,7 @@
 package rtfParseKit.elements;
 
-import com.rtfparserkit.rtf.Command;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -81,7 +78,7 @@ public class MyGroup implements Writeable {
 
         System.out.println("groupIndex:  " + groupIndex);
         try {
-            if(baos.size()>0) {
+            if (baos.size() > 0) {
                 baos.reset();
             }
             baos.write("{".getBytes(utfCharset));

@@ -1,14 +1,12 @@
 package rtfParseKit;
 
-import com.rtfparserkit.converter.text.StringTextConverter;
-import com.rtfparserkit.parser.*;
+import com.rtfparserkit.parser.RtfStreamSource;
 import com.rtfparserkit.parser.standard.StandardRtfParser;
 import rtfParseKit.MyRtfParseKit.TreeChanger;
 import rtfParseKit.elements.MyGroup;
 import rtfParseKit.elements.RootGroup;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -43,21 +41,19 @@ public class ParesKitTest {
 
             RtfStreamSource rtfStreamSource = new RtfStreamSource(is);
 
-            MyListener2 myListener2 = new MyListener2(out);
+            Listener listener = new Listener(out);
             MyListener myListener = new MyListener(out);
 
-            parser.parse(rtfStreamSource, myListener2);
+            parser.parse(rtfStreamSource, listener);
 
-
-
-            RootGroup rootGroup = myListener2.getRootGroup();
+            RootGroup rootGroup = listener.getRootGroup();
 
             TreeChanger treeChanger = new TreeChanger(rootGroup);
             MyGroup temp = TreeChanger.getGroupWithText(rootGroup, "s_002.ssSAPnumber");
 
-            TreeChanger.changeOneStringValue(temp,"\\\\s_002.ssSAPnumber\\\\", "SUPERTEST");
+            TreeChanger.changeOneStringValue(temp, "\\\\s_002.ssSAPnumber\\\\", "SUPERTEST");
             System.out.println(temp.getText());
-            myListener2.writeDocument();
+            listener.writeDocument();
 
 
         } catch (IOException e) {

@@ -1,6 +1,6 @@
 package rtfParseKit.elements;
 
-public class RootGroup extends MyGroup{
+public class RootGroup extends MyGroup {
 
     private static RootGroup rootGroup;
     public boolean start;
@@ -9,8 +9,8 @@ public class RootGroup extends MyGroup{
     }
 
     public static RootGroup getInstance() {
-        if(rootGroup==null) {
-            rootGroup =  new RootGroup();
+        if (rootGroup == null) {
+            rootGroup = new RootGroup();
         }
         return rootGroup;
     }

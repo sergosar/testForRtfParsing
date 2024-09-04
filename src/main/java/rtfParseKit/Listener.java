@@ -5,24 +5,22 @@ import com.rtfparserkit.rtf.Command;
 import org.apache.commons.codec.binary.Hex;
 import rtfParseKit.elements.*;
 
-
 import java.io.IOException;
 import java.io.OutputStream;
-
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MyListener2 implements IRtfListener {
+public class Listener implements IRtfListener {
 
     int commandCount = 0;
     int stringCount = 0;
 
     int groupDepth2Count = 0;
 
-    int groupDepth=1;
+    int groupDepth = 1;
     OutputStream os;
     int groupIndex = 1;
     RootGroup rootGroup;
@@ -41,17 +39,17 @@ public class MyListener2 implements IRtfListener {
     Command previousCommand = null;
 
     final List<String> variables = new ArrayList<>(Arrays.asList
-            ("s_002.ssYppName","s_002.ssSAPnumber","s_002.ssSAPnumber","s_002.ssnumber","s_001. sCustomerPersonHL","s_001. sCustomerPersonHL",
-                    "s_001. ssRepNumAggrAgency","s_001. ddDateAggrAgency","s_001.sDocMC"));
+            ("s_002.ssYppName", "s_002.ssSAPnumber", "s_002.ssSAPnumber", "s_002.ssnumber", "s_001. sCustomerPersonHL", "s_001. sCustomerPersonHL",
+                    "s_001. ssRepNumAggrAgency", "s_001. ddDateAggrAgency", "s_001.sDocMC"));
 
-    public MyListener2(OutputStream os) {
+    public Listener(OutputStream os) {
         this.os = os;
     }
 
     @Override
     public void processDocumentStart() {
         rootGroup = RootGroup.getInstance();
-        currentGroup= rootGroup;
+        currentGroup = rootGroup;
     }
 
     @Override
@@ -69,13 +67,13 @@ public class MyListener2 implements IRtfListener {
     @Override
     public void processGroupStart() {
         var depth = "  ".repeat(groupDepth);
-        System.out.println(groupDepth +depth + "{");
-        if(groupDepth == 2) {
+        System.out.println(groupDepth + depth + "{");
+        if (groupDepth == 2) {
             groupDepth2Count++;
             System.out.println("gruopDepth2Count = " + groupDepth2Count + "groupIndex = " + groupIndex);
         }
-        if(!rootGroup.start) {
-            rootGroup.start=true;
+        if (!rootGroup.start) {
+            rootGroup.start = true;
         } else {
             MyGroup newGroup = new MyGroup(groupIndex++);
             newGroup.setParentGroup(currentGroup);
@@ -90,7 +88,7 @@ public class MyListener2 implements IRtfListener {
         groupDepth--;
         var depth = "  ".repeat(groupDepth);
         System.out.println(groupDepth + depth + "}");
-        currentGroup=currentGroup.getParentGroup();
+        currentGroup = currentGroup.getParentGroup();
 
     }
 
@@ -110,10 +108,10 @@ public class MyListener2 implements IRtfListener {
         String hexStr = null;
         //       if (previousCommand.equals(Command.leveltemplateid)) {
         System.out.println("processString N " + stringCount + ": " + s);
-        if(s.equals(";")) {
+        if (s.equals(";")) {
             currentGroup.getLastCommand().setHasSemicolon(true);
-        } else if(currentGroup.isLastCommand() && (currentGroup.getLastCommand().getCommand().equals(Command.leveltemplateid)
-        || currentGroup.getLastCommand().getCommand().equals(Command.levelnumbers))){
+        } else if (currentGroup.isLastCommand() && (currentGroup.getLastCommand().getCommand().equals(Command.leveltemplateid)
+                || currentGroup.getLastCommand().getCommand().equals(Command.levelnumbers))) {
             currentGroup.addCommandParams(new CommandParams(s));
         } else {
             if (s.contains("\\")) {
@@ -122,20 +120,19 @@ public class MyListener2 implements IRtfListener {
             }
             currentGroup.addString(new MyString(s));
         }
-      //      currentGroup.setStringForWrite(s);
+        //      currentGroup.setStringForWrite(s);
 
         stringCount++;
     }
 
     @Override
     public void processCommand(Command command, int i, boolean b, boolean b1) {
-   //     System.out.println("command N " + commandCount + ": " + command + ",  int i = " + i + ",  boolean b = " + b + ", boolean b1 = " + b1);
+        //     System.out.println("command N " + commandCount + ": " + command + ",  int i = " + i + ",  boolean b = " + b + ", boolean b1 = " + b1);
         previousCommand = command;
-        currentGroup.addCommand(new MyCommand(command,i,b,b1));
+        currentGroup.addCommand(new MyCommand(command, i, b, b1));
 
         commandCount++;
     }
-
 
 
     public static String getHex(String s) {
@@ -181,7 +178,7 @@ public class MyListener2 implements IRtfListener {
     }
 
     public void writeDocument() {
-                try {
+        try {
             os.write(rootGroup.bytesForWriting());
         } catch (IOException e) {
             throw new RuntimeException(e);

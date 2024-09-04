@@ -2,10 +2,7 @@ package rtfParseKit;
 
 import com.rtfparserkit.parser.RtfStreamSource;
 import com.rtfparserkit.parser.standard.StandardRtfParser;
-import rtfParseKit.MyListener;
-import rtfParseKit.MyListener2;
 import rtfParseKit.MyRtfParseKit.TreeChanger;
-import rtfParseKit.elements.MyGroup;
 import rtfParseKit.elements.RootGroup;
 
 import java.io.*;
@@ -16,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ParesKitTest2 {
+public class ParesKit {
     static String readFile(String path, Charset encoding)
             throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
@@ -31,43 +28,28 @@ public class ParesKitTest2 {
             ("test1", "test2", "test3", "test4", "test5", "test6",
                     "test7", "test8", "test9"));
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         final File INPUT_FILE = new File("src/main/resources/Запрос на поставку.rtf");
         final File OUTPUT_FILE = new File("src/main/resources/test1.rtf");
 
 
         InputStream is;
         OutputStream out;
-        try {
 
+        is = new FileInputStream(INPUT_FILE.getPath());
+        out = new FileOutputStream(OUTPUT_FILE.getPath());
 
-            is = new FileInputStream(INPUT_FILE.getPath());
-            out = new FileOutputStream(OUTPUT_FILE.getPath());
+        StandardRtfParser parser = new StandardRtfParser();
+        RtfStreamSource rtfStreamSource = new RtfStreamSource(is);
+        Listener listener = new Listener(out);
+        parser.parse(rtfStreamSource, listener);
 
-            StandardRtfParser parser = new StandardRtfParser();
+        RootGroup rootGroup = listener.getRootGroup();
+        TreeChanger treeChanger = new TreeChanger(rootGroup);
 
-            RtfStreamSource rtfStreamSource = new RtfStreamSource(is);
-
-            MyListener2 myListener2 = new MyListener2(out);
-
-
-            parser.parse(rtfStreamSource, myListener2);
-
-
-            RootGroup rootGroup = myListener2.getRootGroup();
-
-            TreeChanger treeChanger = new TreeChanger(rootGroup);
-
-
-            TreeChanger.changeStringValues(rootGroup, variables, testVariables);
-            TreeChanger.scanCopy();
-//            System.out.println(temp.getText());
-            myListener2.writeDocument();
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        TreeChanger.changeStringValues(rootGroup, variables, testVariables);
+        TreeChanger.scanCopy();
+        listener.writeDocument();
 
 
     }

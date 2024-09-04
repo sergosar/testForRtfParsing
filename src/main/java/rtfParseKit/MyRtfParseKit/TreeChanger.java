@@ -2,7 +2,10 @@ package rtfParseKit.MyRtfParseKit;
 
 import rtfParseKit.elements.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
 
 public class TreeChanger {
     static RootGroup rootGroup;
@@ -227,7 +230,7 @@ public class TreeChanger {
         MyGroup groupBeforeGroupWithEndScan = getNextGroupWithSameDepth(groupWithScan);
         int indexEnd = groupWithEndScan.getParentGroup().getInnerGroups().indexOf(groupWithEndScan);
         System.out.println("indexEnd : " + indexEnd);
-        copyText.getInnerGroups().addAll(groupWithEndScan.getParentGroup().getInnerGroups().subList(indexStart,indexEnd));
+        copyText.getInnerGroups().addAll(groupWithEndScan.getParentGroup().getInnerGroups().subList(indexStart, indexEnd));
         groupWithScan.getParentGroup().getInnerGroups().addAll(indexEnd, copyText.getInnerGroups());
         System.out.println();
     }

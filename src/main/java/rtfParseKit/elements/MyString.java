@@ -2,7 +2,7 @@ package rtfParseKit.elements;
 
 import java.nio.charset.StandardCharsets;
 
-public class MyString implements Writeable{
+public class MyString implements Writeable {
     String data;
 
     public MyString() {
