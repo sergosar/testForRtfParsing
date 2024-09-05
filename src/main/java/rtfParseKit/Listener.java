@@ -109,7 +109,9 @@ public class Listener implements IRtfListener {
         //       if (previousCommand.equals(Command.leveltemplateid)) {
         System.out.println("processString N " + stringCount + ": " + s);
         if (s.equals(";")) {
-            currentGroup.getLastCommand().setHasSemicolon(true);
+                currentGroup.getLastWriteable().setHasSemicolon(true);
+ //           currentGroup.getLastCommand().setHasSemicolon(true);
+
         } else if (currentGroup.isLastCommand() && (currentGroup.getLastCommand().getCommand().equals(Command.leveltemplateid)
                 || currentGroup.getLastCommand().getCommand().equals(Command.levelnumbers))) {
             currentGroup.addCommandParams(new CommandParams(s));
@@ -184,5 +186,7 @@ public class Listener implements IRtfListener {
             throw new RuntimeException(e);
         }
     }
+
+
 }
 

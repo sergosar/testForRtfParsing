@@ -30,13 +30,16 @@ public class ParesKit {
 
     public static void main(String[] args) throws IOException {
         final File INPUT_FILE = new File("src/main/resources/Запрос на поставку.rtf");
+        final File INPUT_FILE2 = new File("src/main/resources/temp/USR_PRJ_KVREP.rtf");
+        final File INPUT_FILE3 = new File("src/main/resources/temp/Вкладной лист кассовой книги.rtf");
+        final File INPUT_FILE4 = new File("src/main/resources/temp/Платежное поручение.rtf");
         final File OUTPUT_FILE = new File("src/main/resources/test1.rtf");
 
 
         InputStream is;
         OutputStream out;
 
-        is = new FileInputStream(INPUT_FILE.getPath());
+        is = new FileInputStream(INPUT_FILE4.getPath());
         out = new FileOutputStream(OUTPUT_FILE.getPath());
 
         StandardRtfParser parser = new StandardRtfParser();
@@ -47,8 +50,8 @@ public class ParesKit {
         RootGroup rootGroup = listener.getRootGroup();
         TreeChanger treeChanger = new TreeChanger(rootGroup);
 
-        TreeChanger.changeStringValues(rootGroup, variables, testVariables);
-        TreeChanger.scanCopy();
+//        TreeChanger.changeStringValues(rootGroup, variables, testVariables);
+//        TreeChanger.scanCopy();
         listener.writeDocument();
 
 

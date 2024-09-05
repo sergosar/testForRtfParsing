@@ -20,7 +20,11 @@ public class MyGroup implements Writeable {
     MyGroup parentGroup = null;
 
     private int groupIndex;
+    boolean hasSemicolon;
 
+    public void setHasSemicolon(boolean hasSemicolon) {
+        this.hasSemicolon = hasSemicolon;
+    }
     public void addCommand(MyCommand myCommand) {
         innerGroups.add(myCommand);
     }
@@ -99,6 +103,9 @@ public class MyGroup implements Writeable {
 //                }
 //
 //            }
+            if (hasSemicolon) {
+                baos.write(";".getBytes(utfCharset));
+            }
             baos.write("}".getBytes(utfCharset));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -112,6 +119,9 @@ public class MyGroup implements Writeable {
         return innerGroups;
     }
 
+    public Writeable getLastWriteable(){
+        return innerGroups.get(innerGroups.size()-1);
+    }
     @Override
     public String getText() {
         return null;

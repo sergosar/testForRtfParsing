@@ -24,4 +24,9 @@ public class CommandParams implements Writeable {
     public String getText() {
         return null;
     }
+
+    @Override
+    public void setHasSemicolon(boolean hasSemicolon) {
+
+    }
 }

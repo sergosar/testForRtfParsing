@@ -22,6 +22,11 @@ public class MyString implements Writeable {
         return data;
     }
 
+    @Override
+    public void setHasSemicolon(boolean hasSemicolon) {
+
+    }
+
     public String getData() {
         return data;
     }
