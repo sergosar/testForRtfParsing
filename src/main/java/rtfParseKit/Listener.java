@@ -110,8 +110,6 @@ public class Listener implements IRtfListener {
         System.out.println("processString N " + stringCount + ": " + s);
         if (s.equals(";")) {
                 currentGroup.getLastWriteable().setHasSemicolon(true);
- //           currentGroup.getLastCommand().setHasSemicolon(true);
-
         } else if (currentGroup.isLastCommand() && (currentGroup.getLastCommand().getCommand().equals(Command.leveltemplateid)
                 || currentGroup.getLastCommand().getCommand().equals(Command.levelnumbers))) {
             currentGroup.addCommandParams(new CommandParams(s));
