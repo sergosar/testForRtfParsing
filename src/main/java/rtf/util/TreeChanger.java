@@ -3,13 +3,7 @@ package rtf.util;
 import com.rtfparserkit.rtf.Command;
 import rtf.elements.*;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -307,7 +301,6 @@ public class TreeChanger {
     }
 
     /**
-     *
      * @param groupWithScanText
      * @param groupWithEndScanText
      */
@@ -329,6 +322,38 @@ public class TreeChanger {
         copyText.getInnerGroups().addAll(groupWithEndScan.getParentGroup().getInnerGroups().subList(indexStart, indexEnd));
         groupWithScan.getParentGroup().getInnerGroups().addAll(indexEnd, copyText.getInnerGroups());
         logger.log(Level.FINE, "");
+    }
+
+    /**
+     * Добавление строк между \Scan\ и \Endscan\
+     * index - номер предыдущей строки таблицы, с которой будут сливаться новые строки
+     */
+    public void addTableRows(MyGroup groupWithScan, MyGroup groupWithEndscan, int index, int quantity) {
+        MyGroup parent = groupWithScan.getParentGroup();
+        MyGroup groupWithPar;
+        if (groupContainsCommand(groupWithScan, Command.par)) {
+            groupWithPar = groupWithScan;
+        } else {
+            groupWithPar = getNextGroupWithCommand(groupWithScan, Command.par);
+        }
+
+
+        int startRowIndex = parent.getInnerGroups().indexOf(groupWithPar);
+        int finishRowIndex = parent.getInnerGroups().indexOf(groupWithEndscan);
+
+        List<Writeable> tableRow = parent.getInnerGroups().subList(startRowIndex + 1, finishRowIndex);
+        List<Writeable> tableRow2 = new ArrayList<>(tableRow);
+
+        int size = tableRow2.size();
+
+        for (int i=0; i<quantity; i++) {
+            parent.getInnerGroups().addAll(finishRowIndex, tableRow2);
+            finishRowIndex += size;
+        }
+
+
+
+
     }
 
     private static MyGroup getNextGroupWithSameDepth(MyGroup previous) {
@@ -356,8 +381,6 @@ public class TreeChanger {
         }
         return result;
     }
-
-
 
 
     /**
@@ -406,48 +429,38 @@ public class TreeChanger {
         }
     }
 
-    /**
-     * Добавление строк между \Scan\ и \Endscan\
-     * index - номер предыдущей строки таблицы, с которой будут сливаться новые строки
-     */
-    public void addTableRows(MyGroup groupWithScan, MyGroup groupWithEndscan, int index, int quantity) {
-        MyGroup parent = groupWithScan.getParentGroup();
-        MyGroup groupWithPar = getNextGroupWithCommand(groupWithScan, Command.par);
-
-        int startRowIndex = parent.getInnerGroups().indexOf(groupWithPar);
-        int finishRowIndex = parent.getInnerGroups().indexOf(groupWithEndscan);
-
-        List<Writeable> tableRow = parent.getInnerGroups().subList(startRowIndex+1,finishRowIndex);
-
-
-
-    }
 
     /**
-     *Получает следущуюю группу за myGroup в которой есть перенос строки(\par)
+     * Получает следущуюю группу за myGroup в которой есть перенос строки(\par)
      */
     private MyGroup getNextGroupWithCommand(MyGroup myGroup, Command command) {
         MyGroup result = getNextGroupWithSameDepth(myGroup);
-        if(groupContainsCommand(result, command)) {
+        if (groupContainsCommand(result, command)) {
             return result;
         } else {
-            return getNextGroupWithCommand(result,command);
+            return getNextGroupWithCommand(result, command);
         }
     }
 
     /**
      * Содержит ли группа комманду command
+     *
      * @return
      */
-    private boolean groupContainsCommand(MyGroup group,Command command) {
-        for (Writeable w : group.getInnerGroups()){
-            if (w instanceof MyCommand && ((MyCommand)w).getCommand()==command) {
+    private boolean groupContainsCommand(MyGroup group, Command command) {
+        for (Writeable w : group.getInnerGroups()) {
+            if (w instanceof MyCommand && ((MyCommand) w).getCommand() == command) {
                 return true;
             }
         }
         return false;
     }
 
+    public void addOneRow(RootGroup rootGroup) {
+        MyGroup groupWithScan = getGroupWithText(rootGroup, "Scan(a)");
+        MyGroup groupWithEndScan = getGroupWithText(rootGroup, "EndScan(a)");
+        addTableRows(groupWithScan, groupWithEndScan, 1, 5);
+    }
 
 
 }

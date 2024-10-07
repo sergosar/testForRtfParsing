@@ -43,6 +43,10 @@ public class RtfEngine {
 
 
         logger.log(Level.WARNING, "entrySet");
+        treeChanger.addOneRow(rootGroup);
+
+
+
 //        for (var entry : context.getCursors().entrySet()) {
 //            logger.log(Level.WARNING, "keyEntry = " + entry.getKey());
 //            ResultSet rs = entry.getValue();
@@ -79,4 +83,7 @@ public class RtfEngine {
             throw new RuntimeException(e);
         }
     }
+
+
+
 }
