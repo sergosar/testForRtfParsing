@@ -3,7 +3,10 @@ package rtf.util;
 import com.rtfparserkit.rtf.Command;
 import rtf.elements.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,7 +47,7 @@ public class TreeChanger {
         for (Writeable w : myGroup.getInnerGroups()) {
             if (w instanceof MyCommand) continue;
             if (w instanceof MyString) {
-                if (w.getText().startsWith("\\")) return myGroup;
+                if (w.getText().startsWith("\\") || w.getText().endsWith("\\")) return myGroup;
             }
             if (w instanceof MyGroup) {
                 MyGroup res = getGroupWithStartSymbol((MyGroup) w);
@@ -53,6 +56,65 @@ public class TreeChanger {
         }
         return result;
     }
+
+    /**
+     * Заполняет List groups списком групп со стартовыми символами
+     *
+     * @param myGroup
+     * @param groups
+     */
+    private static void getGroupsWithStartSymbol(MyGroup myGroup, List<MyGroup> groups) {
+        for (Writeable w : myGroup.getInnerGroups()) {
+            if (w instanceof MyCommand) continue;
+            if (w instanceof MyString) {
+                if (w.getText().startsWith("\\") || w.getText().endsWith("\\")) {
+                    groups.add(myGroup);
+                }
+            }
+            if (w instanceof MyGroup) {
+                getGroupsWithStartSymbol((MyGroup) w, groups);
+            }
+        }
+    }
+
+    private MyGroup getStartGroupWithScan(RootGroup rootGroup, String scanPar) {
+        MyGroup result = null;
+        List<MyGroup> groups = new ArrayList<>();
+        getGroupsWithStartSymbol(rootGroup, groups);
+        // внимательно насчет количества "\\"
+        String template = "\\\\Scan(" + scanPar + ")\\\\";
+        for (MyGroup myGroup : groups) {
+            String str = getFullWord(myGroup);
+            if (str.replaceAll(" ", "").equals(template)) {
+                result = myGroup;
+                break;
+            }
+        }
+        return result;
+    }
+
+    private List<MyGroup> getGroupsWithStartSymbol(RootGroup rootGroup) {
+        List<MyGroup> groups = new ArrayList<>();
+        for (Writeable w : rootGroup.getInnerGroups()) {
+        }
+        return groups;
+    }
+
+    private MyGroup getStartGroupWithEnsScan(RootGroup rootGroup, String scanPar) {
+        MyGroup result = null;
+        List<MyGroup> groups = new ArrayList<>();
+        getGroupsWithStartSymbol(rootGroup, groups);
+        for (MyGroup myGroup : groups) {
+            String str = getFullWord(myGroup);
+            // внимательно насчет количества "\\"
+            if (getFullWord(myGroup).replaceAll(" ", "").equals("\\\\EndScan(" + scanPar + ")\\\\")) {
+                result = myGroup;
+                break;
+            }
+        }
+        return result;
+    }
+
 
     /**
      * Заменяет список из специальных служебных слов на новые значения.
@@ -183,7 +245,7 @@ public class TreeChanger {
         return true;
     }
 
-    public boolean changeOneStringValueFromMap(MyGroup group, Map<String, Object> values) {
+    private boolean changeOneStringValueFromMap(MyGroup group, Map<String, Object> values) {
 
         MyGroup startGroup = getGroupWithStartSymbol(group);
         if (startGroup == null) {
@@ -219,7 +281,7 @@ public class TreeChanger {
         return true;
     }
 
-    public static void deleteGroup(MyGroup myGroup) {
+    private static void deleteGroup(MyGroup myGroup) {
         myGroup.getParentGroup().getInnerGroups().remove(myGroup);
     }
 
@@ -244,7 +306,7 @@ public class TreeChanger {
      * @param previousGroupNum
      * @return группу слудующюю по индексу за previousGroupNum
      */
-    public static MyGroup getNextGroupByNum(MyGroup parentGroup, int previousGroupNum) {
+    private static MyGroup getNextGroupByNum(MyGroup parentGroup, int previousGroupNum) {
         MyGroup result = null;
         for (Writeable w : parentGroup.getInnerGroups()) {
             if (w instanceof MyCommand) continue;
@@ -329,6 +391,7 @@ public class TreeChanger {
      * index - номер предыдущей строки таблицы, с которой будут сливаться новые строки
      */
     public void addTableRows(MyGroup groupWithScan, MyGroup groupWithEndscan, int index, int quantity) {
+
         MyGroup parent = groupWithScan.getParentGroup();
         MyGroup groupWithPar;
         if (groupContainsCommand(groupWithScan, Command.par)) {
@@ -336,7 +399,6 @@ public class TreeChanger {
         } else {
             groupWithPar = getNextGroupWithCommand(groupWithScan, Command.par);
         }
-
 
         int startRowIndex = parent.getInnerGroups().indexOf(groupWithPar);
         int finishRowIndex = parent.getInnerGroups().indexOf(groupWithEndscan);
@@ -346,14 +408,10 @@ public class TreeChanger {
 
         int size = tableRow2.size();
 
-        for (int i=0; i<quantity; i++) {
+        for (int i = 0; i < quantity; i++) {
             parent.getInnerGroups().addAll(finishRowIndex, tableRow2);
             finishRowIndex += size;
         }
-
-
-
-
     }
 
     private static MyGroup getNextGroupWithSameDepth(MyGroup previous) {
@@ -456,10 +514,10 @@ public class TreeChanger {
         return false;
     }
 
-    public void addOneRow(RootGroup rootGroup) {
-        MyGroup groupWithScan = getGroupWithText(rootGroup, "Scan(a)");
-        MyGroup groupWithEndScan = getGroupWithText(rootGroup, "EndScan(a)");
-        addTableRows(groupWithScan, groupWithEndScan, 1, 5);
+    public void addRows(RootGroup rootGroup, String scanPar, int quantity) {
+        MyGroup groupWithScan = getStartGroupWithScan(rootGroup, scanPar);
+        MyGroup groupWithEndScan = getStartGroupWithEnsScan(rootGroup, scanPar);
+        addTableRows(groupWithScan, groupWithEndScan, 1, quantity);
     }
 
 

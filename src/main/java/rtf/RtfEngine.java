@@ -8,8 +8,6 @@ import rtf.listener.Listener;
 import rtf.util.TreeChanger;
 
 import java.io.*;
-import java.sql.ResultSet;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,7 +41,7 @@ public class RtfEngine {
 
 
         logger.log(Level.WARNING, "entrySet");
-        treeChanger.addOneRow(rootGroup);
+        treeChanger.addRows(rootGroup,"STK_INVOISE_TORG12_5ex",3);
 
 
 
@@ -78,7 +76,7 @@ public class RtfEngine {
         String templatePath3 = "src/main/resources/temp/¬кладной лист кассовой книги.rtf";
 
         try {
-            new RtfEngine().render(path, templatePath3);
+            new RtfEngine().render(path, templatePath);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
