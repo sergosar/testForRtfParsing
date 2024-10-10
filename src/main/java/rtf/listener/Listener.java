@@ -52,7 +52,7 @@ public class Listener implements IRtfListener {
         logger.log(Level.FINE, groupDepth + depth + "{");
         if (groupDepth == 2) {
             groupDepth2Count++;
-            logger.log(Level.FINE, "gruopDepth2Count = " + groupDepth2Count + "groupIndex = " + groupIndex);
+//            logger.log(Level.FINE, "gruopDepth2Count = " + groupDepth2Count + "groupIndex = " + groupIndex);
         }
         if (!rootGroup.start) {
             rootGroup.start = true;
@@ -75,17 +75,17 @@ public class Listener implements IRtfListener {
 
     @Override
     public void processCharacterBytes(byte[] bytes) {
-        logger.log(Level.FINE, "processCharacterBytes!!!!!!!!!!!!" + Arrays.toString(bytes));
+//        logger.log(Level.FINE, "processCharacterBytes!!!!!!!!!!!!" + Arrays.toString(bytes));
     }
 
     @Override
     public void processBinaryBytes(byte[] bytes) {
-        logger.log(Level.FINE, "processBinaryBytes!!!!!!!!!!!!!!!!!!!!!!!!! " + Arrays.toString(bytes));
+ //       logger.log(Level.FINE, "processBinaryBytes!!!!!!!!!!!!!!!!!!!!!!!!! " + Arrays.toString(bytes));
     }
 
     @Override
     public void processString(String s) {
-        logger.log(Level.FINE, "processString N " + stringCount + ": " + s);
+//        logger.log(Level.FINE, "processString N " + stringCount + ": " + s);
         if (s.equals(";")) {
             currentGroup.getLastWriteable().setHasSemicolon(true);
         } else if (currentGroup.isLastCommand() && (currentGroup.getLastCommand().getCommand().equals(Command.leveltemplateid)
@@ -102,7 +102,7 @@ public class Listener implements IRtfListener {
 
     @Override
     public void processCommand(Command command, int i, boolean b, boolean b1) {
-        logger.log(Level.WARNING, "command N " + commandCount + ": " + command + ",  int i = " + i + ",  boolean b = " + b + ", boolean b1 = " + b1);
+ //       logger.log(Level.WARNING, "command N " + commandCount + ": " + command + ",  int i = " + i + ",  boolean b = " + b + ", boolean b1 = " + b1);
         previousCommand = command;
         currentGroup.addCommand(new MyCommand(command, i, b, b1));
         if (commandCount == 1) {
