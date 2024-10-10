@@ -81,6 +81,12 @@ public class TreeChanger {
         MyGroup result = null;
         List<MyGroup> groups = new ArrayList<>();
         getGroupsWithStartSymbol(rootGroup, groups);
+
+        for (MyGroup group: groups) {
+
+            System.out.println(getGroupText(group)+"   " +getFullWord(group));
+            System.out.println("index = " + group.getGroupIndex());
+        }
         // внимательно насчет количества "\\"
         String template = "\\\\Scan(" + scanPar + ")\\\\";
         for (MyGroup myGroup : groups) {
@@ -93,19 +99,12 @@ public class TreeChanger {
         return result;
     }
 
-    private List<MyGroup> getGroupsWithStartSymbol(RootGroup rootGroup) {
-        List<MyGroup> groups = new ArrayList<>();
-        for (Writeable w : rootGroup.getInnerGroups()) {
-        }
-        return groups;
-    }
-
     private MyGroup getStartGroupWithEnsScan(RootGroup rootGroup, String scanPar) {
         MyGroup result = null;
         List<MyGroup> groups = new ArrayList<>();
         getGroupsWithStartSymbol(rootGroup, groups);
         for (MyGroup myGroup : groups) {
-            String str = getFullWord(myGroup);
+   //         String str = getFullWord(myGroup);
             // внимательно насчет количества "\\"
             if (getFullWord(myGroup).replaceAll(" ", "").equals("\\\\EndScan(" + scanPar + ")\\\\")) {
                 result = myGroup;
@@ -340,9 +339,9 @@ public class TreeChanger {
      */
     private String getFullWord(MyGroup groupWithStartSymbol) {
         String startGroupText = getGroupText(groupWithStartSymbol);
-        if (startGroupText.endsWith("\\") && startGroupText.length() > 2) {
-            return startGroupText;
-        }
+//        if (startGroupText.endsWith("\\") && startGroupText.length() > 2) {
+//            return startGroupText;
+//        }
         var stringBuilder = new StringBuilder();
         stringBuilder.append(startGroupText);
         var nextGroup = getNextGroup(groupWithStartSymbol);
