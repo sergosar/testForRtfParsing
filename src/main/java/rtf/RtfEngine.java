@@ -42,6 +42,7 @@ public class RtfEngine {
 
         logger.log(Level.WARNING, "entrySet");
         treeChanger.addRows(rootGroup,"STK_INVOISE_TORG12_5ex",3);
+        treeChanger.deleteGroupsWithScan(rootGroup, "STK_INVOISE_TORG12_5ex");
 
 
 
