@@ -2,7 +2,6 @@ package rtf;
 
 import com.rtfparserkit.parser.RtfStreamSource;
 import com.rtfparserkit.parser.standard.StandardRtfParser;
-
 import rtf.elements.RootGroup;
 import rtf.listener.Listener;
 import rtf.util.TreeChanger;
@@ -41,9 +40,12 @@ public class RtfEngine {
 
 
         logger.log(Level.WARNING, "entrySet");
-        treeChanger.addRows(rootGroup,"STK_INVOISE_TORG12_5ex",3);
-        treeChanger.deleteGroupsWithScan(rootGroup, "STK_INVOISE_TORG12_5ex");
+        logger.log(Level.WARNING,"isOnlyTableRowsBetweenScans : ---->"+ treeChanger.isOnlyTableRowsBetweenScans(rootGroup, "STK_INVOISE_TORG12_5ex"));
+//        Thread.sleep(1000);
+        treeChanger.addRows(rootGroup, "STK_INVOISE_TORG12_5ex", 3);
+     //   treeChanger.changeOneStringValueFromMapList()
 
+//        treeChanger.deleteGroupsWithScan(rootGroup, "STK_INVOISE_TORG12_5ex");
 
 
 //        for (var entry : context.getCursors().entrySet()) {
@@ -82,7 +84,6 @@ public class RtfEngine {
             throw new RuntimeException(e);
         }
     }
-
 
 
 }

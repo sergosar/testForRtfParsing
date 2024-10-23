@@ -21,9 +21,6 @@ public class TreeChanger {
         this.rootGroup = rootGroup;
     }
 
-    public static void setNewVariables() {
-    }
-
     public static MyGroup getGroupWithText(MyGroup myGroup, String text) {
         MyGroup result = null;
         for (Writeable w : myGroup.getInnerGroups()) {
@@ -281,6 +278,50 @@ public class TreeChanger {
         return true;
     }
 
+    public boolean changeOneStringValueFromMapList(MyGroup group, Map<String, List<Object>> values) {
+
+        MyGroup startGroup = getGroupWithStartSymbol(group);
+        if (startGroup == null) {
+            return false;
+        }
+        String fullWord = getFullWord(startGroup);
+
+        if (!values.containsKey(fullWord)) {
+            logger.log(Level.WARNING, "getFullWord= " + fullWord);
+            return false;
+        }
+
+        String startGroupText = getGroupText(startGroup);
+        logger.log(Level.FINE, "startGroupText.length() = " + startGroupText.length());
+
+        var valueFromKey = values.get(fullWord).remove(0);
+
+        if (valueFromKey == null) {
+            valueFromKey = "";
+        }
+
+        if (startGroupText.endsWith("\\") && startGroupText.length() > 2) {
+            setGroupNewText(startGroup, fullWord, valueFromKey.toString());
+        } else {
+            setGroupNewText(startGroup, valueFromKey.toString());
+            MyGroup nextGroup = getNextGroupByNum(startGroup.getParentGroup(), startGroup.getGroupIndex());
+
+            while (true) {
+                MyGroup forDelete = nextGroup;
+                nextGroup = getNextGroupByNum(nextGroup.getParentGroup(), nextGroup.getGroupIndex());
+                deleteGroup(forDelete);
+                if (getGroupText(forDelete).endsWith("\\")) break;
+            }
+        }
+        return true;
+    }
+
+    public void changeStringValuesFromMapList(RootGroup rootGroup, String scanPar, Map<String, List<Object>> values) {
+        MyGroup groupWithScan = getStartGroupWithScan(rootGroup, scanPar);
+        MyGroup groupWithEndScan = getStartGroupWithEndScan(rootGroup, scanPar);
+
+    }
+
     private static void deleteGroup(MyGroup myGroup) {
         myGroup.getParentGroup().getInnerGroups().remove(myGroup);
     }
@@ -422,12 +463,26 @@ public class TreeChanger {
         }
     }
 
+    //TO DO переписать для индексов в листе
     private static MyGroup getNextGroupWithSameDepth(MyGroup previous) {
         MyGroup result = null;
         MyGroup parent = previous.getParentGroup();
         for (Writeable w : parent.getInnerGroups()) {
             if (w instanceof MyGroup && ((MyGroup) w).getGroupIndex() > previous.getGroupIndex()) {
                 result = (MyGroup) w;
+                break;
+            }
+        }
+        return result;
+    }
+
+    private static MyGroup getNextGroupWithSameDepthByPosition(MyGroup previous) {
+        MyGroup result = null;
+        MyGroup parent = previous.getParentGroup();
+        int startIndex = parent.getInnerGroups().indexOf(previous);
+        for (int i = startIndex + 1; i < parent.getInnerGroups().size(); i++) {
+            if (parent.getInnerGroups().get(i) instanceof MyGroup) {
+                result = (MyGroup) parent.getInnerGroups().get(i);
                 break;
             }
         }
@@ -497,10 +552,11 @@ public class TreeChanger {
 
 
     /**
-     * Получает следущуюю группу за myGroup в которой есть перенос строки(\par)
+     * Получает следущуюю группу за myGroup в которой есть комманда command
      */
     private MyGroup getNextGroupWithCommand(MyGroup myGroup, Command command) {
-        MyGroup result = getNextGroupWithSameDepth(myGroup);
+//        MyGroup result = getNextGroupWithSameDepth(myGroup);
+        MyGroup result = getNextGroupWithSameDepthByPosition(myGroup);
         if (groupContainsCommand(result, command)) {
             return result;
         } else {
@@ -542,8 +598,8 @@ public class TreeChanger {
             MyGroup forDelete = nextGroup;
             nextGroup = getNextGroupByNum(nextGroup.getParentGroup(), nextGroup.getGroupIndex());
             deleteGroup(forDelete);
-  //          if (getGroupText(forDelete).contains("\\")) break;
-            if(groupContainsCommand(nextGroup, Command.par)) {
+            //          if (getGroupText(forDelete).contains("\\")) break;
+            if (groupContainsCommand(nextGroup, Command.par)) {
                 deleteGroup(nextGroup);
                 break;
             }
@@ -551,4 +607,48 @@ public class TreeChanger {
 
     }
 
+    /**
+     * Проверяет что между Scan и EndScan находятся только строка таблицы, которую нужно копировать.
+     *
+     * @param rootGroup
+     * @param scanPar
+     * @return
+     */
+    public boolean isOnlyTableRowsBetweenScans(RootGroup rootGroup, String scanPar) {
+        MyGroup groupWithScan = getStartGroupWithScan(rootGroup, scanPar);
+        MyGroup groupWithEndScan = getStartGroupWithEndScan(rootGroup, scanPar);
+        if (groupContainsCommand(groupWithScan, Command.par)) {
+            return isNextCommandCellOrPar(groupWithScan);
+        }
+        MyGroup startGroup = getNextGroupWithSameDepthWithCommand(groupWithScan, Command.par);
+        return isNextCommandCellOrPar(startGroup);
+    }
+
+    /**
+     * возвращает true когда следущая команда cell, false когда par
+     */
+    private boolean isNextCommandCellOrPar(MyGroup startGroup) {
+        MyGroup testGroup = getNextGroupWithSameDepthByPosition(startGroup);
+        while (testGroup != null) {
+            if (groupContainsCommand(testGroup, Command.cell)) {
+                return true;
+            } else if (groupContainsCommand(testGroup, Command.par)) {
+                return false;
+            }
+            testGroup = getNextGroupWithSameDepthByPosition(testGroup);
+        }
+        return false;
+    }
+
+    private MyGroup getNextGroupWithSameDepthWithCommand(MyGroup startGroup, Command command) {
+        MyGroup testGroup = getNextGroupWithSameDepthByPosition(startGroup);
+        while (testGroup != null) {
+            if (groupContainsCommand(testGroup, command)) {
+                return testGroup;
+            }
+            testGroup = getNextGroupWithSameDepthByPosition(testGroup);
+        }
+        return null;
+
+    }
 }
