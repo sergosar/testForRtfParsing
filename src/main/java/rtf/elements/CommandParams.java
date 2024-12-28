@@ -31,4 +31,9 @@ public class CommandParams implements Writeable {
     public void setHasSemicolon(boolean hasSemicolon) {
 
     }
+
+    @Override
+    public Writeable getCopy() {
+        return new CommandParams(this.text);
+    }
 }

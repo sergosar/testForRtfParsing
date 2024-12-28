@@ -16,13 +16,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @author Мирошниченко Сергей
+ * @author РњРёСЂРѕС€РЅРёС‡РµРЅРєРѕ РЎРµСЂРіРµР№
  */
-public class RtfEngine {
+public class RtfEngine2 {
     private static final Logger logger = Logger.getLogger(RtfEngine.class.getCanonicalName());
 
     public static final String VNIIEFNS = "ru:vniief:rtf:1.0";
-
 
     public void render(String path, String templatePath, PrintContext context) throws Exception {
         final File INPUT_FILE = new File(templatePath);
@@ -40,28 +39,20 @@ public class RtfEngine {
         RootGroup rootGroup = listener.getRootGroup();
         TreeChanger treeChanger = new TreeChanger(rootGroup);
 
-        //       Map<String, List<Map<String, Object>>> valuesMap = getRSValues(context);
-        Map<String, List<Map<String, Object>>> valuesMap = new HashMap<>();
+        Map<String, List<Map<String, Object>>> valuesMap = getRSValues(context);
 
         String scanPar = treeChanger.getScanPar();
-        while (scanPar != null) {
-//            int quantity = valuesMap.get(scanPar).size();
-            int quantity = 1;
-            if (treeChanger.isOnlyTableRowsBetweenScans(rootGroup, scanPar)) {
-                logger.log(Level.INFO, "while (scanPar !  = " + scanPar);
-                treeChanger.addAndFillRowsFromPrintContext(rootGroup, scanPar, quantity - 1, valuesMap);
-                Utils.fullRefreshIndexes(rootGroup);
-                treeChanger.deleteGroupsWithScan(rootGroup, scanPar);
-                Utils.fullRefreshIndexes(rootGroup);
-            } else {
-                treeChanger.changeStringValuesFromMapListBetweenScanEnd(rootGroup, scanPar, valuesMap);
-                Utils.fullRefreshIndexes(rootGroup);
-            }
-            scanPar = treeChanger.getScanPar();
+        if (scanPar != null && treeChanger.isOnlyTableRowsBetweenScans(rootGroup, scanPar)) {
+            int quantity = valuesMap.get(scanPar).size();
+            treeChanger.addAndFillRowsFromPrintContext(rootGroup, scanPar, quantity - 1, valuesMap);
+            Utils.fullRefreshIndexes(rootGroup);
+            treeChanger.deleteGroupsWithScan(rootGroup, scanPar);
+            Utils.fullRefreshIndexes(rootGroup);
         }
+
         treeChanger.changeStringValuesFromMapList(rootGroup, valuesMap);
         Utils.fullRefreshIndexes(rootGroup);
-       // treeChanger.changeStringValuesFromContext(rootGroup, context);
+        treeChanger.changeStringValuesFromContext(rootGroup, context);
 
         listener.writeDocument();
         try {
@@ -73,28 +64,10 @@ public class RtfEngine {
                 logger.log(Level.OFF, "el = " + el.toString());
             }
         }
-
     }
 
-
-    public static void main(String[] args) {
-        String path = "src/main/resources/test.rtf";
-        String templatePath = "src/main/resources/temp/test2.rtf";
-        String templatePath2 = "src/main/resources/temp/USR_PRJ_KVREP.rtf";
-        String templatePath3 = "src/main/resources/temp/Вкладной лист кассовой книги.rtf";
-        String templatePath4 = "src/main/resources/Мирошниченко/Товарная накладная в собственность TОРГ_12.rtf";
-        String templatePath5 = "src/main/resources/os6_all.rtf";
-
-
-        try {
-            new RtfEngine().render(path, templatePath5, new PrintContext());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-//    private static Map<String, List<Map<String, Object>>> getRSValues(PrintContext context) throws Exception {
-//        Map<String, List<Map<String, Object>>> values = new HashMap<>();
+    private static Map<String, List<Map<String, Object>>> getRSValues(PrintContext context) throws Exception {
+        Map<String, List<Map<String, Object>>> values = new HashMap<>();
 //        for (var entry : context.getCursors().entrySet()) {
 //            values.put(entry.getKey(), new ArrayList<>());
 //            String entryKey = entry.getKey();
@@ -104,8 +77,6 @@ public class RtfEngine {
 //                values.get(entryKey).add(map);
 //            }
 //        }
-//        return values;
+        return values;
+    }
 }
-
-
-

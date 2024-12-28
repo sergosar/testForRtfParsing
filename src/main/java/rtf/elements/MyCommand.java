@@ -60,4 +60,11 @@ public class MyCommand implements Writeable {
     public void setI(int i) {
         this.i = i;
     }
+
+    @Override
+    public Writeable getCopy() {
+        MyCommand command = new MyCommand(this.command, i, b, b1);
+        command.setHasSemicolon(hasSemicolon);
+        return command;
+    }
 }

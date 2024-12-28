@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
@@ -24,6 +25,7 @@ public class MyGroup implements Writeable {
     public void setHasSemicolon(boolean hasSemicolon) {
         this.hasSemicolon = hasSemicolon;
     }
+
     public void addCommand(MyCommand myCommand) {
         innerGroups.add(myCommand);
     }
@@ -51,6 +53,7 @@ public class MyGroup implements Writeable {
     public Writeable getLastWriteable() {
         return innerGroups.get(innerGroups.size() - 1);
     }
+
     public MyGroup getParentGroup() {
         return parentGroup;
     }
@@ -63,6 +66,10 @@ public class MyGroup implements Writeable {
         return groupIndex;
     }
 
+    public void setGroupIndex(int groupIndex) {
+        this.groupIndex = groupIndex;
+    }
+
     public MyGroup() {
     }
 
@@ -72,7 +79,6 @@ public class MyGroup implements Writeable {
 
     @Override
     public byte[] bytesForWriting() {
-//        System.out.println("groupIndex:  " + groupIndex);
         try {
             if (baos.size() > 0) {
                 baos.reset();
@@ -81,18 +87,14 @@ public class MyGroup implements Writeable {
             for (Writeable writeable : innerGroups) {
                 baos.write(writeable.bytesForWriting());
             }
-//            if(hasSemicolon) {
-//                baos.write(";".getBytes(utfCharset));
-//            }
             baos.write("}".getBytes(utfCharset));
-            if(hasSemicolon) {
+            if (hasSemicolon) {
                 baos.write(";".getBytes(utfCharset));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return baos.toByteArray();
-
     }
 
     public List<Writeable> getInnerGroups() {
@@ -102,5 +104,29 @@ public class MyGroup implements Writeable {
     @Override
     public String getText() {
         return null;
+    }
+
+    @Override
+    public Writeable getCopy() {
+        MyGroup copy = new MyGroup();
+        copy.setHasSemicolon(this.hasSemicolon);
+        for (Writeable w : innerGroups) {
+            copy.innerGroups.add(w.getCopy());
+        }
+        copy.setParentGroup(parentGroup);
+        return copy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MyGroup)) return false;
+        MyGroup group = (MyGroup) o;
+        return hasSemicolon == group.hasSemicolon && Objects.equals(innerGroups, group.innerGroups);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(innerGroups, hasSemicolon);
     }
 }

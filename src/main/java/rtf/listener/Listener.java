@@ -6,7 +6,6 @@ import rtf.elements.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,10 +48,10 @@ public class Listener implements IRtfListener {
     @Override
     public void processGroupStart() {
         var depth = "  ".repeat(groupDepth);
-        logger.log(Level.FINE, groupDepth + depth + "{");
+        logger.log(Level.OFF, groupDepth + depth + "{");
         if (groupDepth == 2) {
             groupDepth2Count++;
-//            logger.log(Level.FINE, "gruopDepth2Count = " + groupDepth2Count + "groupIndex = " + groupIndex);
+            logger.log(Level.OFF, "gruopDepth2Count = " + groupDepth2Count + "groupIndex = " + groupIndex);
         }
         if (!rootGroup.start) {
             rootGroup.start = true;
@@ -69,23 +68,23 @@ public class Listener implements IRtfListener {
     public void processGroupEnd() {
         groupDepth--;
         var depth = "  ".repeat(groupDepth);
-        //     logger.log(Level.FINE, groupDepth + " " + depth + "}");
+        logger.log(Level.OFF, groupDepth + " " + depth + "}");
         currentGroup = currentGroup.getParentGroup();
     }
 
     @Override
     public void processCharacterBytes(byte[] bytes) {
-//        logger.log(Level.FINE, "processCharacterBytes!!!!!!!!!!!!" + Arrays.toString(bytes));
+        //парсер никогда не использует в rtf файлах, поэтому нет реализации
     }
 
     @Override
     public void processBinaryBytes(byte[] bytes) {
- //       logger.log(Level.FINE, "processBinaryBytes!!!!!!!!!!!!!!!!!!!!!!!!! " + Arrays.toString(bytes));
+        //парсер никогда не использует в rtf файлах, поэтому нет реализации
     }
 
     @Override
     public void processString(String s) {
-//        logger.log(Level.FINE, "processString N " + stringCount + ": " + s);
+        logger.log(Level.INFO, "processString: " + s);
         if (s.equals(";")) {
             currentGroup.getLastWriteable().setHasSemicolon(true);
         } else if (currentGroup.isLastCommand() && (currentGroup.getLastCommand().getCommand().equals(Command.leveltemplateid)
@@ -102,7 +101,6 @@ public class Listener implements IRtfListener {
 
     @Override
     public void processCommand(Command command, int i, boolean b, boolean b1) {
- //       logger.log(Level.WARNING, "command N " + commandCount + ": " + command + ",  int i = " + i + ",  boolean b = " + b + ", boolean b1 = " + b1);
         previousCommand = command;
         currentGroup.addCommand(new MyCommand(command, i, b, b1));
         if (commandCount == 1) {

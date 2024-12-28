@@ -28,7 +28,9 @@ public class MyString implements Writeable {
 
     @Override
     public void setHasSemicolon(boolean hasSemicolon) {
-
+        // к другим элементам(где встречается точка с запятой) удобнее обращаться через интерфейс,
+        // когда строка сама равна ; , то для простоты обработки и меньшего количества строк в группе,
+        // она добавляется к предшествующему элементу в парсере
     }
 
     public String getData() {
@@ -37,5 +39,10 @@ public class MyString implements Writeable {
 
     public void setData(String data) {
         this.data = Objects.requireNonNullElse(data, "");
+    }
+
+    @Override
+    public Writeable getCopy() {
+        return new MyString(this.data);
     }
 }

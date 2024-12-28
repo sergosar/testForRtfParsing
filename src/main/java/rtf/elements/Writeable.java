@@ -7,6 +7,7 @@ public interface Writeable {
     byte[] bytesForWriting();
 
     String getText();
-
     void setHasSemicolon(boolean hasSemicolon);
+
+    Writeable getCopy();
 }
